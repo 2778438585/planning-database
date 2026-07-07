@@ -32,10 +32,10 @@
 <body>
     <div class="header">
         <h1>国家远景规划与重大项目库</h1>
-        <p>National Planning & Major Projects Database</p >
+        <p>National Planning & Major Projects Database</p>
     </div>
     <div class="nav">
-        <a>首页</a ><a>在建项目</a ><a>远期规划</a ><a>轨道交通</a ><a>机器人</a ><a>新能源</a ><a>科技设施</a >
+        <a>首页</a><a>在建项目</a><a>远期规划</a><a>轨道交通</a><a>机器人</a><a>新能源</a><a>科技设施</a>
     </div>
     <div class="search-area">
         <div class="search-box">
@@ -53,7 +53,7 @@
         </div>
     </div>
     <div class="result-area" id="resultArea">
-        <p style="margin-bottom:16px; color:#666;">共找到 <strong id="resultCount">0</strong> 条结果</p >
+        <p style="margin-bottom:16px; color:#666;">共找到 <strong id="resultCount">0</strong> 条结果</p>
         <div id="resultList"></div>
     </div>
     <div class="footer">本库数据均来源于各级政府公开发布文件 · 仅供参考</div>
@@ -65,7 +65,8 @@
             { name: "冷泉生态系统研究装置", province: "广东", city: "广州", district: "南沙区", status: "在建", type: "大科学装置", field: "科技设施", summary: "国家重大科技基础设施，用于深海冷泉生态系统研究，是全球首个此类装置。落户广州南沙科学城。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
             { name: "广州白云国际机场三期扩建", province: "广东", city: "广州", district: "花都区/白云区", status: "在建", type: "机场", field: "轨道交通", summary: "建设T3航站楼、第四跑道和第五跑道，同步建设综合交通中心，打造世界级航空枢纽。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
             { name: "广州机器人产业园", province: "广东", city: "广州", district: "黄埔区", status: "在建", type: "产业园", field: "机器人", summary: "聚焦工业机器人、服务机器人、特种机器人研发制造，引进多家头部企业，打造粤港澳大湾区机器人产业高地。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
-            { name: "深中通道", province: "广东", city: "深圳/中山", district: "宝安区/翠亨新区", status: "在建", type: "过江通道", field: "轨道交通", summary: "连接深圳与中山的跨海通道，集桥、岛、隧于一体，全长约24公里，通车后深中两地车程缩短至30分钟以内。", source: "广东省2026年重点建设项目计划", link: "" }
+            { name: "深中通道", province: "广东", city: "深圳/中山", district: "宝安区/翠亨新区", status: "在建", type: "过江通道", field: "轨道交通", summary: "连接深圳与中山的跨海通道，集桥、岛、隧于一体，全长约24公里，通车后深中两地车程缩短至30分钟以内。", source: "广东省2026年重点建设项目计划", link: "" },
+            { name: "人类细胞谱系大科学研究设施", province: "广东", city: "广州", district: "黄埔区", status: "在建", type: "大科学装置", field: "科技设施", summary: "国家重大科技基础设施，全球首个跨尺度、多模态的人类细胞谱系研究平台，绘制人类全生命周期细胞动态谱系图谱，推动医学从对症治疗迈向对因治疗。", source: "广州市2026年重点建设项目计划", link: "" }
         ];
         function doSearch() {
             const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
@@ -83,10 +84,10 @@
             const ra = document.getElementById('resultArea');
             const rl = document.getElementById('resultList');
             const rc = document.getElementById('resultCount');
-            if (results.length === 0) { ra.style.display = 'block'; rc.textContent = '0'; rl.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">未找到匹配的项目，请尝试其他关键词或条件。</p >'; return; }
+            if (results.length === 0) { ra.style.display = 'block'; rc.textContent = '0'; rl.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">未找到匹配的项目，请尝试其他关键词或条件。</p>'; return; }
             ra.style.display = 'block'; rc.textContent = results.length;
             let html = '';
-            results.forEach(p => { html += `<div class="result-item"><h3>${p.name}</h3><div class="meta">${p.province} · ${p.city} · ${p.district} | 状态：<span style="color:${p.status==='在建'?'#2e7d32':'#e65100'}">${p.status}</span> | 类型：${p.type} | 领域：${p.field}</div><div class="summary">${p.summary}</div><div style="margin-top:6px; color:#999; font-size:12px;">来源：${p.source} ${p.link ? `<a href=" " target="_blank" style="color:#c41e3a; margin-left:8px;">查看原文</a >` : ''}</div></div>`; });
+            results.forEach(p => { html += `<div class="result-item"><h3>${p.name}</h3><div class="meta">${p.province} · ${p.city} · ${p.district} | 状态：<span style="color:${p.status==='在建'?'#2e7d32':'#e65100'}">${p.status}</span> | 类型：${p.type} | 领域：${p.field}</div><div class="summary">${p.summary}</div><div style="margin-top:6px; color:#999; font-size:12px;">来源：${p.source} ${p.link ? `<a href="${p.link}" target="_blank" style="color:#c41e3a; margin-left:8px;">查看原文</a>` : ''}</div></div>`; });
             rl.innerHTML = html;
         }
         function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
