@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>国家远景规划与重大项目库</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: "Microsoft YaHei", "宋体", sans-serif; background-color: #f5f5f5; }
+        .header { background-color: #c41e3a; color: white; text-align: center; padding: 30px 20px; }
+        .header h1 { font-size: 32px; letter-spacing: 4px; margin-bottom: 8px; }
+        .header p { font-size: 14px; opacity: 0.9; }
+        .nav { background-color: white; border-bottom: 2px solid #c41e3a; display: flex; justify-content: center; gap: 30px; padding: 12px 0; flex-wrap: wrap; }
+        .nav a { text-decoration: none; color: #333; font-size: 15px; cursor: pointer; }
+        .nav a:hover { color: #c41e3a; }
+        .search-area { background-color: white; padding: 40px 20px; text-align: center; margin: 20px auto; max-width: 800px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); }
+        .search-box { display: flex; justify-content: center; gap: 10px; }
+        .search-box input { width: 500px; padding: 12px 16px; font-size: 16px; border: 2px solid #ccc; border-radius: 4px; outline: none; }
+        .search-box input:focus { border-color: #c41e3a; }
+        .search-box button { padding: 12px 30px; font-size: 16px; background-color: #c41e3a; color: white; border: none; border-radius: 4px; cursor: pointer; }
+        .search-box button:hover { background-color: #a01830; }
+        .advanced-btn { display: inline-block; margin-top: 16px; color: #c41e3a; font-size: 14px; cursor: pointer; text-decoration: underline; }
+        .result-area { max-width: 800px; margin: 20px auto; background-color: white; padding: 20px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); display: none; }
+        .result-item { padding: 16px 0; border-bottom: 1px solid #eee; }
+        .result-item:last-child { border-bottom: none; }
+        .result-item h3 { color: #c41e3a; font-size: 18px; margin-bottom: 6px; }
+        .result-item .meta { color: #666; font-size: 13px; margin-bottom: 6px; }
+        .result-item .summary { color: #333; font-size: 14px; line-height: 1.6; }
+        .footer { text-align: center; padding: 30px; color: #999; font-size: 13px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>国家远景规划与重大项目库</h1>
+        <p>National Planning & Major Projects Database</p >
+    </div>
+    <div class="nav">
+        <a>首页</a ><a>在建项目</a ><a>远期规划</a ><a>轨道交通</a ><a>机器人</a ><a>新能源</a ><a>科技设施</a >
+    </div>
+    <div class="search-area">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="输入项目名称、地域或领域关键词...">
+            <button onclick="doSearch()">检 索</button>
+        </div>
+        <span class="advanced-btn" onclick="toggleFilter()">高级检索</span>
+        <div id="filterArea" style="display:none; margin-top:20px; text-align:left;">
+            <div style="display:flex; gap:20px; flex-wrap:wrap; justify-content:center;">
+                <div><label>省份：</label><select id="filterProvince"><option value="">全部</option><option>广东</option><option>北京</option><option>上海</option></select></div>
+                <div><label>建设状态：</label><select id="filterStatus"><option value="">全部</option><option>在建</option><option>规划/预备</option></select></div>
+                <div><label>领域：</label><select id="filterField"><option value="">全部</option><option>轨道交通</option><option>机器人</option><option>新能源</option><option>科技设施</option></select></div>
+                <button onclick="doSearch()" style="padding:8px 20px; background:#c41e3a; color:white; border:none; border-radius:4px; cursor:pointer;">筛选</button>
+            </div>
+        </div>
+    </div>
+    <div class="result-area" id="resultArea">
+        <p style="margin-bottom:16px; color:#666;">共找到 <strong id="resultCount">0</strong> 条结果</p >
+        <div id="resultList"></div>
+    </div>
+    <div class="footer">本库数据均来源于各级政府公开发布文件 · 仅供参考</div>
+    <script>
+        const projects = [
+            { name: "广州地铁22号线南延段", province: "广东", city: "广州", district: "南沙区", status: "规划/预备", type: "地铁", field: "轨道交通", summary: "自番禺广场站引出，经南沙客运港，跨海至东莞滨海湾新区，终至深圳光明城。是粤港澳大湾区城际铁路网的重要组成部分。", source: "广州市2026年重点建设预备项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "广州地铁18号线北延段（广花城际）", province: "广东", city: "广州", district: "花都区", status: "在建", type: "地铁", field: "轨道交通", summary: "自广州东站引出，经京溪路、白云东平、白云城市中心、方石、凤凰南路至花都花城街。未来规划继续北延至清远。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "广州地铁11号线", province: "广东", city: "广州", district: "海珠区/荔湾区/白云区/天河区/越秀区", status: "在建", type: "地铁", field: "轨道交通", summary: "广州市区环线，途经琶洲、芳村、广州火车站、广州东站等核心节点，串联多条放射线路，实现全城快速换乘。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "冷泉生态系统研究装置", province: "广东", city: "广州", district: "南沙区", status: "在建", type: "大科学装置", field: "科技设施", summary: "国家重大科技基础设施，用于深海冷泉生态系统研究，是全球首个此类装置。落户广州南沙科学城。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "广州白云国际机场三期扩建", province: "广东", city: "广州", district: "花都区/白云区", status: "在建", type: "机场", field: "轨道交通", summary: "建设T3航站楼、第四跑道和第五跑道，同步建设综合交通中心，打造世界级航空枢纽。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "广州机器人产业园", province: "广东", city: "广州", district: "黄埔区", status: "在建", type: "产业园", field: "机器人", summary: "聚焦工业机器人、服务机器人、特种机器人研发制造，引进多家头部企业，打造粤港澳大湾区机器人产业高地。", source: "广州市2026年重点建设项目计划", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
+            { name: "深中通道", province: "广东", city: "深圳/中山", district: "宝安区/翠亨新区", status: "在建", type: "过江通道", field: "轨道交通", summary: "连接深圳与中山的跨海通道，集桥、岛、隧于一体，全长约24公里，通车后深中两地车程缩短至30分钟以内。", source: "广东省2026年重点建设项目计划", link: "" }
+        ];
+        function doSearch() {
+            const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
+            const fp = document.getElementById('filterProvince').value;
+            const fs = document.getElementById('filterStatus').value;
+            const ff = document.getElementById('filterField').value;
+            let results = projects;
+            if (keyword) { results = results.filter(p => p.name.toLowerCase().includes(keyword) || p.city.toLowerCase().includes(keyword) || p.district.toLowerCase().includes(keyword) || p.summary.toLowerCase().includes(keyword) || p.field.toLowerCase().includes(keyword) || p.province.toLowerCase().includes(keyword)); }
+            if (fp) { results = results.filter(p => p.province === fp); }
+            if (fs) { results = results.filter(p => p.status === fs); }
+            if (ff) { results = results.filter(p => p.field === ff); }
+            displayResults(results);
+        }
+        function displayResults(results) {
+            const ra = document.getElementById('resultArea');
+            const rl = document.getElementById('resultList');
+            const rc = document.getElementById('resultCount');
+            if (results.length === 0) { ra.style.display = 'block'; rc.textContent = '0'; rl.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">未找到匹配的项目，请尝试其他关键词或条件。</p >'; return; }
+            ra.style.display = 'block'; rc.textContent = results.length;
+            let html = '';
+            results.forEach(p => { html += `<div class="result-item"><h3>${p.name}</h3><div class="meta">${p.province} · ${p.city} · ${p.district} | 状态：<span style="color:${p.status==='在建'?'#2e7d32':'#e65100'}">${p.status}</span> | 类型：${p.type} | 领域：${p.field}</div><div class="summary">${p.summary}</div><div style="margin-top:6px; color:#999; font-size:12px;">来源：${p.source} ${p.link ? `<a href=" " target="_blank" style="color:#c41e3a; margin-left:8px;">查看原文</a >` : ''}</div></div>`; });
+            rl.innerHTML = html;
+        }
+        function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
+        document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { doSearch(); } });
+    </script>
+</body>
+</html>
