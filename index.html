@@ -218,4 +218,44 @@
             const fs = document.getElementById('filterStatus').value;
             const ff = document.getElementById('filterField').value;
             let results = projects;
-            if (keyword) { results = results.filter(p => p.name.toLowerCase().includes(keyword) || p.city.toLowerCase().includes(keyword) ||
+            if (keyword) { results = results.filter(p => p.name.toLowerCase().includes(keyword) || p.city.toLowerCase().includes(keyword) || p.district.toLowerCase().includes(keyword) || p.field.toLowerCase().includes(keyword) || p.province.toLowerCase().includes(keyword) || (p.overview && p.overview.toLowerCase().includes(keyword))); }
+            if (fp) { results = results.filter(p => p.province === fp); }
+            if (fs) { results = results.filter(p => p.status === fs); }
+            if (ff) { results = results.filter(p => p.field === ff); }
+            displayResults(results);
+        }
+        function displayResults(results) {
+            const ra = document.getElementById('resultArea');
+            const rl = document.getElementById('resultList');
+            const rc = document.getElementById('resultCount');
+            if (results.length === 0) { ra.style.display = 'block'; rc.textContent = '0'; rl.innerHTML = '<p style="text-align:center; color:#999; padding:40px;">未找到匹配的项目，请尝试其他关键词或条件。</p>'; return; }
+            ra.style.display = 'block'; rc.textContent = results.length;
+            let html = '';
+            results.forEach(p => { html += `<div class="result-item"><h3 style="cursor:pointer;" onclick="openDetail('${p.name.replace(/'/g, "\\'")}')">${p.name}</h3><div class="meta">${p.province} · ${p.city} · ${p.district} | 状态：<span style="color:${p.status==='在建'?'#2e7d32':'#e65100'}">${p.status}</span> | 类型：${p.type} | 领域：${p.field}</div><div class="summary">${p.overview ? p.overview.substring(0, 100) + '...' : ''}</div></div>`; });
+            rl.innerHTML = html;
+        }
+        function openDetail(name) {
+            const project = projects.find(p => p.name === name);
+            if (!project) return;
+            let html = `<div class="modal-content"><span class="close-btn" onclick="closeDetail()">&times;</span>`;
+            html += `<div class="detail-title">${project.name}</div>`;
+            html += `<div class="detail-section"><h4>基本信息</h4><p>所属区域：${project.province} · ${project.city} · ${project.district}</p><p>建设状态：${project.status} | 项目类型：${project.type} | 领域分类：${project.field}</p></div>`;
+            if (project.overview) html += `<div class="detail-section"><h4>项目概述</h4><p>${project.overview}</p></div>`;
+            if (project.content) html += `<div class="detail-section"><h4>主要建设内容</h4><p>${project.content}</p></div>`;
+            if (project.significance) html += `<div class="detail-section"><h4>建设意义</h4><p>${project.significance}</p></div>`;
+            if (project.source) html += `<div class="detail-section"><h4>数据来源</h4><p>${project.source}</p></div>`;
+            html += `</div>`;
+            const modal = document.createElement('div');
+            modal.id = 'projectModal'; modal.className = 'modal'; modal.style.display = 'block';
+            modal.innerHTML = html;
+            document.body.appendChild(modal);
+        }
+        function closeDetail() {
+            const modal = document.getElementById('projectModal');
+            if (modal) modal.remove();
+        }
+        function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
+        document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { doSearch(); } });
+    </script>
+</body>
+</html>
