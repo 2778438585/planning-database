@@ -20,11 +20,20 @@
         .search-box button { padding: 12px 30px; font-size: 16px; background-color: #c41e3a; color: white; border: none; border-radius: 4px; cursor: pointer; }
         .search-box button:hover { background-color: #a01830; }
         .advanced-btn { display: inline-block; margin-top: 16px; color: #c41e3a; font-size: 14px; cursor: pointer; text-decoration: underline; }
-        .filter-group { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; align-items: end; }
+        .region-panel { display: none; margin-top: 20px; border: 1px solid #eee; border-radius: 4px; background: #fafafa; padding: 15px; }
+        .province-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        .province-item { padding: 6px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .province-item:hover, .province-item.active { background: #c41e3a; color: white; border-color: #c41e3a; }
+        .alphabet-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
+        .alphabet-nav a { display: inline-block; padding: 4px 8px; color: #c41e3a; text-decoration: none; font-weight: bold; cursor: pointer; border-radius: 2px; }
+        .alphabet-nav a:hover { background: #c41e3a; color: white; }
+        .city-district-area { display: flex; gap: 20px; justify-content: center; }
+        .city-list, .district-list { display: flex; flex-wrap: wrap; gap: 8px; }
+        .city-item, .district-item { padding: 4px 10px; background: #fff; border: 1px solid #eee; border-radius: 4px; cursor: pointer; font-size: 13px; }
+        .city-item:hover, .city-item.active { background: #c41e3a; color: white; border-color: #c41e3a; }
+        .district-item:hover, .district-item.active { background: #2196F3; color: white; border-color: #2196F3; }
+        .filter-group { display: flex; justify-content: center; gap: 20px; margin-top: 20px; flex-wrap: wrap; }
         .filter-group select { padding: 10px 15px; font-size: 14px; border: 1px solid #ccc; border-radius: 4px; background: white; min-width: 150px; }
-        .filter-group select:disabled { background: #f0f0f0; color: #999; }
-        .filter-group .btn-small { padding: 10px 18px; font-size: 14px; background: #c41e3a; color: white; border: none; border-radius: 4px; cursor: pointer; white-space: nowrap; }
-        .filter-group .btn-small:hover { background: #a01830; }
         .result-area { max-width: 900px; margin: 20px auto; background-color: white; padding: 20px; border-radius: 4px; box-shadow: 0 1px 4px rgba(0,0,0,0.1); display: none; }
         .result-item { padding: 16px 0; border-bottom: 1px solid #eee; }
         .result-item:last-child { border-bottom: none; }
@@ -62,46 +71,36 @@
 </div>
 <div class="search-area">
     <div class="search-box">
-        <input type="text" id="searchInput" placeholder="输入项目名称、关键词或省份名称筛选...">
+        <input type="text" id="searchInput" placeholder="输入项目名称或关键词搜索...">
         <button onclick="doSearch()">检 索</button>
     </div>
-    <span class="advanced-btn" onclick="toggleFilter()">按区域筛选</span>
-    <div id="filterArea" style="display:none; margin-top:20px;">
-        <div class="filter-group">
+    <span class="advanced-btn" onclick="toggleRegionPanel()">按区域筛选</span>
+    <div id="regionPanel" class="region-panel">
+        <div class="alphabet-nav" id="alphabetNav"></div>
+        <div class="province-list" id="provinceList"></div>
+        <div class="city-district-area" id="cityDistrictArea" style="display:none;">
             <div>
-                <label>省份：</label>
-                <select id="filterProvince" onchange="onProvinceChange()">
-                    <option value="">全部省份</option>
-                </select>
-                <button class="btn-small" onclick="searchByProvince()" style="margin-left:8px;">查看该省全部</button>
+                <strong>城市</strong>
+                <div class="city-list" id="cityList"></div>
             </div>
             <div>
-                <label>城市：</label>
-                <select id="filterCity" onchange="onCityChange()" disabled>
-                    <option value="">全部城市</option>
-                </select>
-            </div>
-            <div>
-                <label>区/县：</label>
-                <select id="filterDistrict" onchange="onDistrictChange()" disabled>
-                    <option value="">全部区县</option>
-                </select>
+                <strong>区/县</strong>
+                <div class="district-list" id="districtList"></div>
             </div>
         </div>
-        <div class="filter-group" style="margin-top:10px;">
-            <div>
-                <label>建设状态：</label>
-                <select id="filterStatus" onchange="doSearch()">
-                    <option value="">全部</option><option>规划中</option><option>在建</option><option>已建成</option><option>持续建设</option><option>规划/预备</option>
-                </select>
-            </div>
-            <div>
-                <label>领域：</label>
-                <select id="filterField" onchange="doSearch()">
-                    <option value="">全部</option><option>轨道交通</option><option>科技设施</option><option>城市更新</option><option>水利设施</option><option>机器人</option>
-                </select>
-            </div>
-            <button onclick="doSearch()" style="padding:10px 25px; background:#c41e3a; color:white; border:none; border-radius:4px; cursor:pointer;">组合筛选</button>
+    </div>
+    <div class="filter-group">
+        <div>
+            <label>建设状态：</label>
+            <select id="filterStatus" onchange="doSearch()">
+                <option value="">全部</option><option>规划中</option><option>在建</option><option>已建成</option><option>持续建设</option><option>规划/预备</option>
+            </select>
+        </div>
+        <div>
+            <label>领域：</label>
+            <select id="filterField" onchange="doSearch()">
+                <option value="">全部</option><option>轨道交通</option><option>科技设施</option><option>城市更新</option><option>水利设施</option><option>机器人</option>
+            </select>
         </div>
     </div>
 </div>
@@ -554,128 +553,145 @@
         }
     };
 
-    // 初始化省份下拉框
-    function initRegionSelectors() {
-        const provSelect = document.getElementById('filterProvince');
+    // 当前选中的区域
+    let selectedProvince = '';
+    let selectedCity = '';
+
+    // 初始化字母导航和省份列表
+    function initRegionPanel() {
+        const alphabetNav = document.getElementById('alphabetNav');
+        const provinceList = document.getElementById('provinceList');
         const provinces = Object.keys(regionData).sort();
+        const alphabetGroups = {};
         provinces.forEach(prov => {
-            const option = document.createElement('option');
-            option.value = prov;
-            option.textContent = prov;
-            provSelect.appendChild(option);
+            // 获取省份的首字母（处理中文拼音首字母）
+            let firstChar = prov.charAt(0);
+            if (!alphabetGroups[firstChar]) alphabetGroups[firstChar] = [];
+            alphabetGroups[firstChar].push(prov);
+        });
+        // 渲染字母导航
+        const sortedKeys = Object.keys(alphabetGroups).sort();
+        alphabetNav.innerHTML = '';
+        sortedKeys.forEach(key => {
+            alphabetNav.innerHTML += `<a onclick="scrollToLetter('${key}')">${key}</a>`;
+        });
+        // 渲染省份列表
+        provinceList.innerHTML = '';
+        provinces.forEach(prov => {
+            provinceList.innerHTML += `<span class="province-item" data-prov="${prov}" onclick="selectProvince('${prov}')">${prov}</span>`;
         });
     }
 
-    // 重置所有筛选器并搜索全部
-    function resetAndSearch() {
-        document.getElementById('searchInput').value = '';
-        document.getElementById('filterProvince').value = '';
-        document.getElementById('filterCity').value = '';
-        document.getElementById('filterCity').disabled = true;
-        document.getElementById('filterDistrict').value = '';
-        document.getElementById('filterDistrict').disabled = true;
-        document.getElementById('filterStatus').value = '';
-        document.getElementById('filterField').value = '';
+    // 滚动到指定字母
+    function scrollToLetter(letter) {
+        const provinceList = document.getElementById('provinceList');
+        const items = provinceList.querySelectorAll('.province-item');
+        for (let item of items) {
+            if (item.textContent.charAt(0) === letter) {
+                item.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                break;
+            }
+        }
+    }
+
+    // 选择省份
+    function selectProvince(prov) {
+        selectedProvince = prov;
+        selectedCity = '';
+        // 高亮选中省份
+        document.querySelectorAll('.province-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.textContent === prov) item.classList.add('active');
+        });
+        // 显示城市列表
+        const cityDistrictArea = document.getElementById('cityDistrictArea');
+        const cityList = document.getElementById('cityList');
+        const districtList = document.getElementById('districtList');
+        cityList.innerHTML = '';
+        districtList.innerHTML = '';
+        if (regionData[prov]) {
+            const cities = Object.keys(regionData[prov]).sort();
+            cities.forEach(city => {
+                cityList.innerHTML += `<span class="city-item" onclick="selectCity('${prov}', '${city}')">${city}</span>`;
+            });
+            cityDistrictArea.style.display = 'flex';
+        } else {
+            cityDistrictArea.style.display = 'none';
+        }
+        // 立即搜索该省的项目
         doSearch();
     }
 
-    // 导航栏：按状态筛选（会保留其他条件）
-    function filterByStatus(status) {
-        // 重置其他筛选器
+    // 选择城市
+    function selectCity(prov, city) {
+        selectedCity = city;
+        // 高亮选中城市
+        document.querySelectorAll('.city-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.textContent === city) item.classList.add('active');
+        });
+        // 显示区县列表
+        const districtList = document.getElementById('districtList');
+        districtList.innerHTML = '';
+        if (regionData[prov] && regionData[prov][city]) {
+            const districts = regionData[prov][city];
+            districts.forEach(district => {
+                districtList.innerHTML += `<span class="district-item" onclick="selectDistrict('${district}')">${district}</span>`;
+            });
+        }
+        // 立即搜索该城市的项目
+        doSearch();
+    }
+
+    // 选择区县
+    function selectDistrict(district) {
+        // 高亮选中区县
+        document.querySelectorAll('.district-item').forEach(item => {
+            item.classList.remove('active');
+            if (item.textContent === district) item.classList.add('active');
+        });
+        // 将区县临时存入变量，用于搜索
+        window.selectedDistrict = district;
+        doSearch();
+    }
+
+    // 切换区域筛选面板
+    function toggleRegionPanel() {
+        const panel = document.getElementById('regionPanel');
+        panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+    }
+
+    // 重置所有筛选器
+    function resetAndSearch() {
         document.getElementById('searchInput').value = '';
-        document.getElementById('filterProvince').value = '';
-        document.getElementById('filterCity').value = '';
-        document.getElementById('filterCity').disabled = true;
-        document.getElementById('filterDistrict').value = '';
-        document.getElementById('filterDistrict').disabled = true;
+        document.getElementById('filterStatus').value = '';
         document.getElementById('filterField').value = '';
+        selectedProvince = '';
+        selectedCity = '';
+        window.selectedDistrict = '';
+        document.getElementById('cityDistrictArea').style.display = 'none';
+        document.getElementById('cityList').innerHTML = '';
+        document.getElementById('districtList').innerHTML = '';
+        document.querySelectorAll('.province-item, .city-item, .district-item').forEach(item => item.classList.remove('active'));
+        // 隐藏结果区域
+        document.getElementById('resultArea').style.display = 'none';
+    }
+
+    // 导航栏：按状态筛选
+    function filterByStatus(status) {
+        resetAndSearch();
         document.getElementById('filterStatus').value = status;
         doSearch();
     }
 
-    // 导航栏：按领域筛选（会保留其他条件）
+    // 导航栏：按领域筛选
     function filterByField(field) {
-        // 重置其他筛选器
-        document.getElementById('searchInput').value = '';
-        document.getElementById('filterProvince').value = '';
-        document.getElementById('filterCity').value = '';
-        document.getElementById('filterCity').disabled = true;
-        document.getElementById('filterDistrict').value = '';
-        document.getElementById('filterDistrict').disabled = true;
-        document.getElementById('filterStatus').value = '';
+        resetAndSearch();
         document.getElementById('filterField').value = field;
         doSearch();
     }
 
-    function onProvinceChange() {
-        const provSelect = document.getElementById('filterProvince');
-        const citySelect = document.getElementById('filterCity');
-        const districtSelect = document.getElementById('filterDistrict');
-        const selectedProv = provSelect.value;
-        citySelect.innerHTML = '<option value="">全部城市</option>';
-        districtSelect.innerHTML = '<option value="">全部区县</option>';
-        districtSelect.disabled = true;
-        if (selectedProv && regionData[selectedProv]) {
-            const cities = Object.keys(regionData[selectedProv]).sort();
-            cities.forEach(city => {
-                const option = document.createElement('option');
-                option.value = city;
-                option.textContent = city;
-                citySelect.appendChild(option);
-            });
-            citySelect.disabled = false;
-        } else {
-            citySelect.disabled = true;
-        }
-        // 选了省份自动搜索
-        doSearch();
-    }
-
-    function onCityChange() {
-        updateDistricts();
-        // 选了城市自动搜索
-        doSearch();
-    }
-
-    function updateDistricts() {
-        const provSelect = document.getElementById('filterProvince');
-        const citySelect = document.getElementById('filterCity');
-        const districtSelect = document.getElementById('filterDistrict');
-        const selectedProv = provSelect.value;
-        const selectedCity = citySelect.value;
-        districtSelect.innerHTML = '<option value="">全部区县</option>';
-        if (selectedProv && selectedCity && regionData[selectedProv] && regionData[selectedProv][selectedCity]) {
-            const districts = regionData[selectedProv][selectedCity];
-            districts.forEach(district => {
-                const option = document.createElement('option');
-                option.value = district;
-                option.textContent = district;
-                districtSelect.appendChild(option);
-            });
-            districtSelect.disabled = false;
-        } else {
-            districtSelect.disabled = true;
-        }
-    }
-
-    function onDistrictChange() {
-        // 选了区县自动搜索
-        doSearch();
-    }
-
-    function searchByProvince() {
-        const provSelect = document.getElementById('filterProvince');
-        const fp = provSelect.value;
-        if (!fp) {
-            alert('请先选择一个省份');
-            return;
-        }
-        document.getElementById('filterCity').value = '';
-        document.getElementById('filterDistrict').value = '';
-        doSearch();
-    }
-
-    // ==================== 全部48条项目数据（一字不差） ====================
+    // ==================== 项目数据 ====================
     const projects = [
         { name: "广州地铁10号线", province: "广东", city: "广州", district: "荔湾区/天河区", status: "在建", type: "地铁", field: "轨道交通", overview: "10号线新建段（西塱—天河客运站）是广州地铁网的重要加密线路，将加强荔湾与天河核心区的联系，缓解既有线路压力，填补沿线轨道交通空白。", source: "广州市2026年重点建设项目计划", issuer: "广州市发展和改革委员会", source_detail: "广州市发展和改革委员会关于印发广州市2026年重点建设项目计划的通知", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
         { name: "广州地铁11号线", province: "广东", city: "广州", district: "越秀区/海珠区/天河区/白云区/荔湾区", status: "在建", type: "地铁", field: "轨道交通", overview: "广州市区环线，途经琶洲、芳村、广州火车站、广州东站等核心节点，串联多条放射线路，实现全城快速换乘。换乘站多达20余座，是中心城区最重要的换乘骨干线，极大提升广州地铁网络通达度。", source: "广州市2026年重点建设项目计划", issuer: "广州市发展和改革委员会", source_detail: "广州市发展和改革委员会关于印发广州市2026年重点建设项目计划的通知", link: "https://www.gz.gov.cn/attachment/7/7975/7975557/10694627.pdf" },
@@ -730,11 +746,15 @@
     // ==================== 搜索逻辑 ====================
     function doSearch() {
         const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
-        const fp = document.getElementById('filterProvince').value;
-        const fc = document.getElementById('filterCity').value;
-        const fd = document.getElementById('filterDistrict').value;
         const fs = document.getElementById('filterStatus').value;
         const ff = document.getElementById('filterField').value;
+        const fd = window.selectedDistrict || '';
+        
+        // 如果没有关键词、没有选择省份、没有选择状态和领域，且没有选择区县，则不搜索
+        if (!keyword && !selectedProvince && !fs && !ff && !fd) {
+            return;
+        }
+        
         let results = projects;
         if (keyword) {
             results = results.filter(p => 
@@ -748,8 +768,8 @@
                 (p.significance && p.significance.toLowerCase().includes(keyword))
             );
         }
-        if (fp) results = results.filter(p => p.province === fp);
-        if (fc) results = results.filter(p => p.city === fc);
+        if (selectedProvince) results = results.filter(p => p.province === selectedProvince);
+        if (selectedCity) results = results.filter(p => p.city === selectedCity);
         if (fd) results = results.filter(p => p.district && p.district.indexOf(fd) !== -1);
         if (fs) results = results.filter(p => p.status === fs);
         if (ff) results = results.filter(p => p.field === ff);
@@ -792,11 +812,9 @@
         const modal = document.getElementById('projectModal');
         if (modal) modal.remove();
     }
-    function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
-    document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { doSearch(); } });
 
     // 启动
-    initRegionSelectors();
+    initRegionPanel();
 </script>
 </body>
 </html>
