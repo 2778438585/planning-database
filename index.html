@@ -51,6 +51,7 @@
         .source-section p{font-size:14px;color:#555;line-height:1.8}
         .official-link{display:inline-block;margin-top:10px;padding:8px 20px;background-color:#c41e3a;color:white;text-decoration:none;border-radius:4px;font-size:14px}
         .official-link:hover{background-color:#a01830}
+        .search-highlight{background:#ffe600;color:#333;padding:0 2px;border-radius:2px}
     </style>
 </head>
 <body>
@@ -118,7 +119,6 @@
 
     let selectedProvince = ''; let selectedCity = ''; window.selectedDistrict = '';
 
-    // 全文搜索辅助函数：在项目所有文本字段中查找关键词
     function fullTextSearch(project, keyword) {
         if (!keyword) return true;
         const fields = [project.name, project.city, project.district, project.overview, project.content, project.significance, project.province, project.field, project.type, project.status];
@@ -183,28 +183,23 @@
         citySpans.forEach(span => { span.style.display = (keyword === '' || span.textContent.toLowerCase().includes(keyword)) ? '' : 'none'; });
     }
 
-    // 当用户在顶部搜索框输入时，动态过滤省市列表
     function onKeywordInput() {
         const keyword = document.getElementById('searchInput').value.trim();
         if (!keyword) {
-            // 清空搜索框时，恢复全部省市列表
             initRegionPanel();
             document.getElementById('cityList').innerHTML = '';
             document.getElementById('districtList').innerHTML = '';
             return;
         }
-        // 根据关键词过滤省份
         const provinceList = document.getElementById('provinceList');
         const allProvinces = Object.keys(regionData).sort();
         provinceList.innerHTML = '';
         allProvinces.forEach(prov => {
-            // 省份名包含关键词，或者该省下有项目包含关键词
             if (prov.indexOf(keyword) !== -1 || projects.some(p => p.province === prov && fullTextSearch(p, keyword))) {
                 const span = document.createElement('span'); span.textContent = prov;
                 span.onclick = () => selectProvince(prov); provinceList.appendChild(span);
             }
         });
-        // 清空城市和区县列表
         document.getElementById('cityList').innerHTML = '';
         document.getElementById('districtList').innerHTML = '';
     }
@@ -225,7 +220,6 @@
         document.getElementById('regionPanel').style.display = 'none';
         document.getElementById('advancedFilters').style.display = 'none';
         document.getElementById('resultArea').style.display = 'none';
-        // 恢复完整的省份列表
         initRegionPanel();
     }
 
@@ -311,10 +305,34 @@
     function openDetail(name) {
         const project = projects.find(p => p.name === name);
         if (!project) return;
-        let html = `<div class="modal-content"><span class="close-btn" onclick="closeDetail()">&times;</span><div class="detail-title">${project.name}</div><div class="detail-section"><h4>基本信息</h4><p>所属区域：${project.province} · ${project.city} · ${project.district}</p><p>建设状态：${project.status} | 项目类型：${project.type} | 领域分类：${project.field}</p></div>`;
-        if (project.overview) html += `<div class="detail-section"><h4>项目概述</h4><p>${project.overview}</p></div>`;
-        if (project.content) html += `<div class="detail-section"><h4>主要建设内容</h4><p>${project.content}</p></div>`;
-        if (project.significance) html += `<div class="detail-section"><h4>建设意义</h4><p>${project.significance}</p></div>`;
+        const keyword = document.getElementById('searchInput').value.trim();
+        let displayName = project.name;
+        let displayOverview = project.overview || '';
+        let displayContent = project.content || '';
+        let displaySignificance = project.significance || '';
+        let displayDistrict = project.district || '';
+        let displayCity = project.city || '';
+        let displayField = project.field || '';
+        let displayType = project.type || '';
+        let displayStatus = project.status || '';
+        let displayProvince = project.province || '';
+        if (keyword) {
+            const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+            displayName = displayName.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayOverview = displayOverview.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayContent = displayContent.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displaySignificance = displaySignificance.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayDistrict = displayDistrict.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayCity = displayCity.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayField = displayField.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayType = displayType.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayStatus = displayStatus.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+            displayProvince = displayProvince.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
+        }
+        let html = `<div class="modal-content"><span class="close-btn" onclick="closeDetail()">&times;</span><div class="detail-title">${displayName}</div><div class="detail-section"><h4>基本信息</h4><p>所属区域：${displayProvince} · ${displayCity} · ${displayDistrict}</p><p>建设状态：${displayStatus} | 项目类型：${displayType} | 领域分类：${displayField}</p></div>`;
+        if (displayOverview) html += `<div class="detail-section"><h4>项目概述</h4><p>${displayOverview}</p></div>`;
+        if (displayContent) html += `<div class="detail-section"><h4>主要建设内容</h4><p>${displayContent}</p></div>`;
+        if (displaySignificance) html += `<div class="detail-section"><h4>建设意义</h4><p>${displaySignificance}</p></div>`;
         html += `<div class="source-section"><h4>权威索引</h4><p>发布机构：${project.issuer||'相关政府部门'}</p><p>来源文件：${project.source}</p><p>原文标题：${project.source_detail||''}</p></div>`;
         if (project.link) html += `<a href="${project.link}" target="_blank" class="official-link">查看政府原文</a>`;
         else html += `<p style="color:#999;">暂无在线原文链接，请查阅相关政府公报。</p>`;
