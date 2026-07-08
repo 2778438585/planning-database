@@ -51,7 +51,6 @@
         .source-section p{font-size:14px;color:#555;line-height:1.8}
         .official-link{display:inline-block;margin-top:10px;padding:8px 20px;background-color:#c41e3a;color:white;text-decoration:none;border-radius:4px;font-size:14px}
         .official-link:hover{background-color:#a01830}
-        .search-highlight{background:#ffe600;color:#333;padding:0 2px;border-radius:2px}
     </style>
 </head>
 <body>
@@ -306,16 +305,8 @@
         const project = projects.find(p => p.name === name);
         if (!project) return;
         const keyword = document.getElementById('searchInput').value.trim();
-        let displayName = project.name;
-        let displayOverview = project.overview || '';
-        let displayContent = project.content || '';
-        let displaySignificance = project.significance || '';
-        let displayDistrict = project.district || '';
-        let displayCity = project.city || '';
-        let displayField = project.field || '';
-        let displayType = project.type || '';
-        let displayStatus = project.status || '';
-        let displayProvince = project.province || '';
+        let displayName = project.name, displayOverview = project.overview || '', displayContent = project.content || '', displaySignificance = project.significance || '';
+        let displayDistrict = project.district || '', displayCity = project.city || '', displayField = project.field || '', displayType = project.type || '', displayStatus = project.status || '', displayProvince = project.province || '';
         if (keyword) {
             const regex = new RegExp(`(${keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
             displayName = displayName.replace(regex, '<span style="background:#ffe600;color:#333;padding:0 2px;border-radius:2px;">$1</span>');
