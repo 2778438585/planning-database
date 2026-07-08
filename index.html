@@ -21,12 +21,12 @@
         .search-box button:hover { background-color: #a01830; }
         .advanced-btn { display: inline-block; margin-top: 16px; color: #c41e3a; font-size: 14px; cursor: pointer; text-decoration: underline; }
         .region-panel { display: none; margin-top: 20px; border: 1px solid #eee; border-radius: 4px; background: #fafafa; padding: 15px; }
-        .province-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; justify-content: center; }
-        .province-item { padding: 6px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
-        .province-item:hover, .province-item.active { background: #c41e3a; color: white; border-color: #c41e3a; }
         .alphabet-nav { display: flex; justify-content: center; gap: 4px; margin-bottom: 10px; flex-wrap: wrap; }
         .alphabet-nav a { display: inline-block; padding: 4px 8px; color: #c41e3a; text-decoration: none; font-weight: bold; cursor: pointer; border-radius: 2px; }
         .alphabet-nav a:hover { background: #c41e3a; color: white; }
+        .province-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 15px; justify-content: center; }
+        .province-item { padding: 6px 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; cursor: pointer; font-size: 14px; transition: all 0.2s; }
+        .province-item:hover, .province-item.active { background: #c41e3a; color: white; border-color: #c41e3a; }
         .city-district-area { display: flex; gap: 20px; justify-content: center; }
         .city-list, .district-list { display: flex; flex-wrap: wrap; gap: 8px; }
         .city-item, .district-item { padding: 4px 10px; background: #fff; border: 1px solid #eee; border-radius: 4px; cursor: pointer; font-size: 13px; }
@@ -72,7 +72,7 @@
 <div class="search-area">
     <div class="search-box">
         <input type="text" id="searchInput" placeholder="输入项目名称或关键词搜索...">
-        <button onclick="doSearch()">检 索</button>
+        <button onclick="triggerSearch()">检 索</button>
     </div>
     <span class="advanced-btn" onclick="toggleRegionPanel()">按区域筛选</span>
     <div id="regionPanel" class="region-panel">
@@ -556,26 +556,24 @@
     // 当前选中的区域
     let selectedProvince = '';
     let selectedCity = '';
+    let selectedDistrict = '';
 
-    // 初始化字母导航和省份列表
+    // 初始化区域筛选面板
     function initRegionPanel() {
         const alphabetNav = document.getElementById('alphabetNav');
         const provinceList = document.getElementById('provinceList');
         const provinces = Object.keys(regionData).sort();
         const alphabetGroups = {};
         provinces.forEach(prov => {
-            // 获取省份的首字母（处理中文拼音首字母）
             let firstChar = prov.charAt(0);
             if (!alphabetGroups[firstChar]) alphabetGroups[firstChar] = [];
             alphabetGroups[firstChar].push(prov);
         });
-        // 渲染字母导航
         const sortedKeys = Object.keys(alphabetGroups).sort();
         alphabetNav.innerHTML = '';
         sortedKeys.forEach(key => {
             alphabetNav.innerHTML += `<a onclick="scrollToLetter('${key}')">${key}</a>`;
         });
-        // 渲染省份列表
         provinceList.innerHTML = '';
         provinces.forEach(prov => {
             provinceList.innerHTML += `<span class="province-item" data-prov="${prov}" onclick="selectProvince('${prov}')">${prov}</span>`;
@@ -598,12 +596,14 @@
     function selectProvince(prov) {
         selectedProvince = prov;
         selectedCity = '';
-        // 高亮选中省份
+        selectedDistrict = '';
+        // 高亮
         document.querySelectorAll('.province-item').forEach(item => {
             item.classList.remove('active');
             if (item.textContent === prov) item.classList.add('active');
         });
-        // 显示城市列表
+        document.querySelectorAll('.city-item, .district-item').forEach(item => item.classList.remove('active'));
+        // 显示城市
         const cityDistrictArea = document.getElementById('cityDistrictArea');
         const cityList = document.getElementById('cityList');
         const districtList = document.getElementById('districtList');
@@ -618,19 +618,24 @@
         } else {
             cityDistrictArea.style.display = 'none';
         }
-        // 立即搜索该省的项目
+        // 重置状态和领域筛选
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterField').value = '';
+        // 立即搜索
         doSearch();
     }
 
     // 选择城市
     function selectCity(prov, city) {
         selectedCity = city;
-        // 高亮选中城市
+        selectedDistrict = '';
+        // 高亮
         document.querySelectorAll('.city-item').forEach(item => {
             item.classList.remove('active');
             if (item.textContent === city) item.classList.add('active');
         });
-        // 显示区县列表
+        document.querySelectorAll('.district-item').forEach(item => item.classList.remove('active'));
+        // 显示区县
         const districtList = document.getElementById('districtList');
         districtList.innerHTML = '';
         if (regionData[prov] && regionData[prov][city]) {
@@ -639,41 +644,43 @@
                 districtList.innerHTML += `<span class="district-item" onclick="selectDistrict('${district}')">${district}</span>`;
             });
         }
-        // 立即搜索该城市的项目
+        // 重置状态和领域筛选
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterField').value = '';
+        // 立即搜索
         doSearch();
     }
 
     // 选择区县
     function selectDistrict(district) {
-        // 高亮选中区县
+        selectedDistrict = district;
+        // 高亮
         document.querySelectorAll('.district-item').forEach(item => {
             item.classList.remove('active');
             if (item.textContent === district) item.classList.add('active');
         });
-        // 将区县临时存入变量，用于搜索
-        window.selectedDistrict = district;
+        // 立即搜索
         doSearch();
     }
 
-    // 切换区域筛选面板
+    // 切换区域面板
     function toggleRegionPanel() {
         const panel = document.getElementById('regionPanel');
         panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
     }
 
-    // 重置所有筛选器
+    // 重置所有筛选
     function resetAndSearch() {
         document.getElementById('searchInput').value = '';
         document.getElementById('filterStatus').value = '';
         document.getElementById('filterField').value = '';
         selectedProvince = '';
         selectedCity = '';
-        window.selectedDistrict = '';
+        selectedDistrict = '';
         document.getElementById('cityDistrictArea').style.display = 'none';
         document.getElementById('cityList').innerHTML = '';
         document.getElementById('districtList').innerHTML = '';
         document.querySelectorAll('.province-item, .city-item, .district-item').forEach(item => item.classList.remove('active'));
-        // 隐藏结果区域
         document.getElementById('resultArea').style.display = 'none';
     }
 
@@ -688,6 +695,19 @@
     function filterByField(field) {
         resetAndSearch();
         document.getElementById('filterField').value = field;
+        doSearch();
+    }
+
+    // 触发关键词搜索
+    function triggerSearch() {
+        // 重置区域选择
+        selectedProvince = '';
+        selectedCity = '';
+        selectedDistrict = '';
+        document.querySelectorAll('.province-item, .city-item, .district-item').forEach(item => item.classList.remove('active'));
+        document.getElementById('cityDistrictArea').style.display = 'none';
+        document.getElementById('cityList').innerHTML = '';
+        document.getElementById('districtList').innerHTML = '';
         doSearch();
     }
 
@@ -748,12 +768,6 @@
         const keyword = document.getElementById('searchInput').value.trim().toLowerCase();
         const fs = document.getElementById('filterStatus').value;
         const ff = document.getElementById('filterField').value;
-        const fd = window.selectedDistrict || '';
-        
-        // 如果没有关键词、没有选择省份、没有选择状态和领域，且没有选择区县，则不搜索
-        if (!keyword && !selectedProvince && !fs && !ff && !fd) {
-            return;
-        }
         
         let results = projects;
         if (keyword) {
@@ -770,7 +784,7 @@
         }
         if (selectedProvince) results = results.filter(p => p.province === selectedProvince);
         if (selectedCity) results = results.filter(p => p.city === selectedCity);
-        if (fd) results = results.filter(p => p.district && p.district.indexOf(fd) !== -1);
+        if (selectedDistrict) results = results.filter(p => p.district && p.district.indexOf(selectedDistrict) !== -1);
         if (fs) results = results.filter(p => p.status === fs);
         if (ff) results = results.filter(p => p.field === ff);
         displayResults(results);
