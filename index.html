@@ -77,13 +77,13 @@
             </div>
             <div>
                 <label>城市：</label>
-                <select id="filterCity" onchange="updateDistricts()" disabled>
+                <select id="filterCity" onchange="onCityChange()" disabled>
                     <option value="">全部城市</option>
                 </select>
             </div>
             <div>
                 <label>区/县：</label>
-                <select id="filterDistrict" disabled>
+                <select id="filterDistrict" onchange="onDistrictChange()" disabled>
                     <option value="">全部区县</option>
                 </select>
             </div>
@@ -91,13 +91,13 @@
         <div class="filter-group" style="margin-top:10px;">
             <div>
                 <label>建设状态：</label>
-                <select id="filterStatus">
+                <select id="filterStatus" onchange="doSearch()">
                     <option value="">全部</option><option>规划中</option><option>在建</option><option>已建成</option><option>持续建设</option><option>规划/预备</option>
                 </select>
             </div>
             <div>
                 <label>领域：</label>
-                <select id="filterField">
+                <select id="filterField" onchange="doSearch()">
                     <option value="">全部</option><option>轨道交通</option><option>科技设施</option><option>城市更新</option><option>水利设施</option><option>机器人</option>
                 </select>
             </div>
@@ -579,16 +579,30 @@
         doSearch();
     }
 
-    // 导航栏：按状态筛选
+    // 导航栏：按状态筛选（会保留其他条件）
     function filterByStatus(status) {
-        resetAndSearch();
+        // 重置其他筛选器
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterProvince').value = '';
+        document.getElementById('filterCity').value = '';
+        document.getElementById('filterCity').disabled = true;
+        document.getElementById('filterDistrict').value = '';
+        document.getElementById('filterDistrict').disabled = true;
+        document.getElementById('filterField').value = '';
         document.getElementById('filterStatus').value = status;
         doSearch();
     }
 
-    // 导航栏：按领域筛选
+    // 导航栏：按领域筛选（会保留其他条件）
     function filterByField(field) {
-        resetAndSearch();
+        // 重置其他筛选器
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterProvince').value = '';
+        document.getElementById('filterCity').value = '';
+        document.getElementById('filterCity').disabled = true;
+        document.getElementById('filterDistrict').value = '';
+        document.getElementById('filterDistrict').disabled = true;
+        document.getElementById('filterStatus').value = '';
         document.getElementById('filterField').value = field;
         doSearch();
     }
@@ -617,8 +631,10 @@
         doSearch();
     }
 
-    function updateCities() {
-        onProvinceChange();
+    function onCityChange() {
+        updateDistricts();
+        // 选了城市自动搜索
+        doSearch();
     }
 
     function updateDistricts() {
@@ -640,7 +656,10 @@
         } else {
             districtSelect.disabled = true;
         }
-        // 选了城市自动搜索
+    }
+
+    function onDistrictChange() {
+        // 选了区县自动搜索
         doSearch();
     }
 
@@ -775,9 +794,6 @@
     }
     function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
     document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { doSearch(); } });
-
-    // 区县筛选自动触发
-    document.getElementById('filterDistrict').addEventListener('change', doSearch);
 
     // 启动
     initRegionSelectors();
