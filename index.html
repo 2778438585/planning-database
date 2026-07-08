@@ -52,7 +52,13 @@
     <p>权威索引 · 政府原文 · 精准定位</p>
 </div>
 <div class="nav">
-    <a>首页</a><a>在建项目</a><a>远期规划</a><a>轨道交通</a><a>科技设施</a><a>城市更新</a><a>水利设施</a>
+    <a onclick="resetAndSearch()">首页</a>
+    <a onclick="filterByStatus('在建')">在建项目</a>
+    <a onclick="filterByStatus('规划/预备')">远期规划</a>
+    <a onclick="filterByField('轨道交通')">轨道交通</a>
+    <a onclick="filterByField('科技设施')">科技设施</a>
+    <a onclick="filterByField('城市更新')">城市更新</a>
+    <a onclick="filterByField('水利设施')">水利设施</a>
 </div>
 <div class="search-area">
     <div class="search-box">
@@ -558,6 +564,33 @@
             option.textContent = prov;
             provSelect.appendChild(option);
         });
+    }
+
+    // 重置所有筛选器并搜索全部
+    function resetAndSearch() {
+        document.getElementById('searchInput').value = '';
+        document.getElementById('filterProvince').value = '';
+        document.getElementById('filterCity').value = '';
+        document.getElementById('filterCity').disabled = true;
+        document.getElementById('filterDistrict').value = '';
+        document.getElementById('filterDistrict').disabled = true;
+        document.getElementById('filterStatus').value = '';
+        document.getElementById('filterField').value = '';
+        doSearch();
+    }
+
+    // 导航栏：按状态筛选
+    function filterByStatus(status) {
+        resetAndSearch();
+        document.getElementById('filterStatus').value = status;
+        doSearch();
+    }
+
+    // 导航栏：按领域筛选
+    function filterByField(field) {
+        resetAndSearch();
+        document.getElementById('filterField').value = field;
+        doSearch();
     }
 
     function onProvinceChange() {
