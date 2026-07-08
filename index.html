@@ -580,6 +580,8 @@
         } else {
             citySelect.disabled = true;
         }
+        // 选了省份自动搜索
+        doSearch();
     }
 
     function updateCities() {
@@ -605,6 +607,8 @@
         } else {
             districtSelect.disabled = true;
         }
+        // 选了城市自动搜索
+        doSearch();
     }
 
     function searchByProvince() {
@@ -694,7 +698,7 @@
         }
         if (fp) results = results.filter(p => p.province === fp);
         if (fc) results = results.filter(p => p.city === fc);
-        if (fd) results = results.filter(p => p.district && p.district.includes(fd));
+        if (fd) results = results.filter(p => p.district && p.district.indexOf(fd) !== -1);
         if (fs) results = results.filter(p => p.status === fs);
         if (ff) results = results.filter(p => p.field === ff);
         displayResults(results);
@@ -738,6 +742,9 @@
     }
     function toggleFilter() { const a = document.getElementById('filterArea'); a.style.display = a.style.display === 'none' ? 'block' : 'none'; }
     document.getElementById('searchInput').addEventListener('keydown', function(e) { if (e.key === 'Enter') { doSearch(); } });
+
+    // 区县筛选自动触发
+    document.getElementById('filterDistrict').addEventListener('change', doSearch);
 
     // 启动
     initRegionSelectors();
