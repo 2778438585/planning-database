@@ -586,7 +586,16 @@
         if (displayOverview) html += `<div class="detail-section"><h4>项目概述</h4><p>${displayOverview}</p></div>`;
         if (displayContent) html += `<div class="detail-section"><h4>主要建设内容</h4><p>${displayContent}</p></div>`;
         if (displaySignificance) html += `<div class="detail-section"><h4>建设意义</h4><p>${displaySignificance}</p></div>`;
-        html += `<div class="source-section"><h4>权威索引</h4><p>发布机构：${project.issuer||'相关政府部门'}</p><p>来源文件：${project.source}</p><p>原文标题：${project.source_detail||''}</p></div>`;
+             // 构建权威索引区域，让来源文件可点击
+        let sourceHtml = `<div class="source-section"><h4>权威索引</h4>`;
+        sourceHtml += `<p>发布机构：${project.issuer||'相关政府部门'}</p>`;
+        if (project.link) {
+            sourceHtml += `<p>来源文件：<a href="${project.link}" target="_blank" style="color:#1565C0;text-decoration:underline;">${project.source}</a></p>`;
+        } else {
+            sourceHtml += `<p>来源文件：${project.source}</p>`;
+        }
+        sourceHtml += `<p>原文标题：${project.source_detail||''}</p></div>`;
+        html += sourceHtml;
         if (project.link) html += `<a href="${project.link}" target="_blank" class="official-link">查看政府原文</a>`;
         else html += `<p style="color:#999;">暂无在线原文链接，请查阅相关政府公报。</p>`;
         html += `</div>`;
